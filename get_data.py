@@ -3,7 +3,7 @@
 import requests
 import pandas as pd
 import time
-from .normalize_ohlc import normalize_symbol, normalize_timeframe, normalize_ohlc, to_unix_timestamp
+from .normalize_data import normalize_symbol, normalize_timeframe, normalize_ohlc, to_unix_timestamp
 import json
 
 def get_ohlc(symbol: str, timeframe: int = 15, from_date: int = None, to_date: int = None) -> pd.DataFrame:
