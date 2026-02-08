@@ -1,5 +1,5 @@
 from .get_and_clean_data import get_and_clean_data
-
+from .plot_candlestick import plot_candlestick
 
 # from numpy.testing._private.utils import assert_allclose
 import pandas as pd
@@ -12,6 +12,45 @@ from matplotlib.transforms import blended_transform_factory
 
 
 
+DEFAULT_CONFIG = {
+    # === plot_candlestick ===
+    "up_color": "#fbc02d",
+    "down_color": "#9598a1",
+    "edge_color": None,
+    "wick_color": None,
+    "volume_color": "#7cb5ec",
+    "bg_color": "#131722",
+    "grid_color": "#e0e0e0",
+    "grid_style": "--",
+    "grid_alpha": 0.3,
+    "show_grid": False,
+    "candle_width": 0.6,
+    "date_format": "%m/%d %H:%M",
+    "rotation": 45,
+    "show_nontrading": False,
+    "plot_current_price": False,
+    # Font and text styling
+    "title_fontsize": 14,
+    "title_fontweight": "bold",
+    "title_color": "white",
+    "label_fontsize": 11,
+    "label_color": "#d1d4dc",
+    "tick_fontsize": 9,
+    "tick_color": "#787b86",
+    "legend_fontsize": 10,
+    # Axes styling
+    "spine_color": "#2a2e39",
+    "spine_linewidth": 1,
+    "show_top_spine": False,
+    "show_right_spine": False,
+    # Layout
+    "y_padding": 0.05,
+
+    "show_legend": False,
+    "right_margin": 8,
+}
+
+
 
 def plot_strategy(
     auto_figsize: bool=True,
@@ -22,6 +61,8 @@ def plot_strategy(
     height: float=9,
     df=None,
     output_candles=None,
+    tf=None,
+    asset=None,
     
 
         
@@ -150,57 +191,51 @@ def plot_strategy(
     fig, axes = plt.subplots(
         rows, cols,
         figsize=figsize,  # Use calculated figsize
-        facecolor=self.config['bg_color'],
+        facecolor=DEFAULT_CONFIG['bg_color'],
         # gridspec_kw={'height_ratios': [7, 1]},
     )
 
     plot_candlestick(
         ax=axes[0],
-        df=self.df,
-        tf=self.tf,
-        ticker=self.asset,
-        timezone=self.config["ohlc_tz"],
-        up_color=self.config["up_color"],
-        down_color=self.config["down_color"],
-        edge_color=self.config["edge_color"],
-        wick_color=self.config["wick_color"],
-        volume_color=self.config["volume_color"],
-        bg_color=self.config["bg_color"],
-        grid_color=self.config["grid_color"],
-        grid_style=self.config["grid_style"],
-        grid_alpha=self.config["grid_alpha"],
-        show_grid=self.config["show_grid"],
-        candle_width=self.config["candle_width"],
-        date_format=self.config["date_format"],
-        rotation=self.config["rotation"],
-        show_nontrading=self.config["show_nontrading"],
-        title_fontsize=self.config["title_fontsize"],
-        title_fontweight=self.config["title_fontweight"],
-        title_color=self.config["title_color"],
-        label_fontsize=self.config["label_fontsize"],
-        label_color=self.config["label_color"],
-        tick_fontsize=self.config["tick_fontsize"],
-        tick_color=self.config["tick_color"],
-        spine_color=self.config["spine_color"],
-        spine_linewidth=self.config["spine_linewidth"],
-        show_top_spine=self.config["show_top_spine"],
-        show_right_spine=self.config["show_right_spine"],
-        y_padding=self.config["y_padding"]
+        df=df,
+        tf=tf,
+        ticker=asset,
+        timezone=DEFAULT_CONFIG["ohlc_tz"],
+        up_color=DEFAULT_CONFIG["up_color"],
+        down_color=DEFAULT_CONFIG["down_color"],
+        edge_color=DEFAULT_CONFIG["edge_color"],
+        wick_color=DEFAULT_CONFIG["wick_color"],
+        volume_color=DEFAULT_CONFIG["volume_color"],
+        bg_color=DEFAULT_CONFIG["bg_color"],
+        grid_color=DEFAULT_CONFIG["grid_color"],
+        grid_style=DEFAULT_CONFIG["grid_style"],
+        grid_alpha=DEFAULT_CONFIG["grid_alpha"],
+        show_grid=DEFAULT_CONFIG["show_grid"],
+        candle_width=DEFAULT_CONFIG["candle_width"],
+        date_format=DEFAULT_CONFIG["date_format"],
+        rotation=DEFAULT_CONFIG["rotation"],
+        show_nontrading=DEFAULT_CONFIG["show_nontrading"],
+        title_fontsize=DEFAULT_CONFIG["title_fontsize"],
+        title_fontweight=DEFAULT_CONFIG["title_fontweight"],
+        title_color=DEFAULT_CONFIG["title_color"],
+        label_fontsize=DEFAULT_CONFIG["label_fontsize"],
+        label_color=DEFAULT_CONFIG["label_color"],
+        tick_fontsize=DEFAULT_CONFIG["tick_fontsize"],
+        tick_color=DEFAULT_CONFIG["tick_color"],
+        spine_color=DEFAULT_CONFIG["spine_color"],
+        spine_linewidth=DEFAULT_CONFIG["spine_linewidth"],
+        show_top_spine=DEFAULT_CONFIG["show_top_spine"],
+        show_right_spine=DEFAULT_CONFIG["show_right_spine"],
+        y_padding=DEFAULT_CONFIG["y_padding"]
     )
 
     xlim = axes[0].get_xlim()
-    right_margin = self.config['right_margin']
+    right_margin = DEFAULT_CONFIG['right_margin']
     axes[0].set_xlim(xlim[0], xlim[1] + right_margin)
 
     # Add all overlay elements
-    _add_session_backgrounds_and_labels(axes[0], self.df, self.asset)
-    _plot_ma(axes[0], self.df, self.asset)
-    _plot_last_price_line(axes[0], self.df, self.asset)
-    _plot_last_datetime_info(axes[0], self.df, self.asset)
-    # _plot_other_datetime_info(axes[0], self.df, self.asset, tf=self.tf)
-    _plot_position_box(axes[0], self.df, self.asset)
-    _plot_signal_scatter(axes[0], self.df, self.asset)
-    _plot_macd(axes[1], self.df, self.asset)
+    _plot_last_price_line(axes[0], df, asset)
+    _plot_last_datetime_info(axes[0], df, asset)
 
     plt.tight_layout()
     return fig
