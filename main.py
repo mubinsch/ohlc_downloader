@@ -52,6 +52,13 @@ DEFAULT_CONFIG = {
 
 
 
+
+def download_csv():
+    # code yourself
+
+
+
+
 def plot_strategy(
     auto_figsize: bool=True,
     figsize: tuple=(16, 9),

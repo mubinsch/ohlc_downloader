@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OHLC Data Tool</title>
+    <link rel="stylesheet" href="https://unpkg.com/w.css@1.0.0/dist/w.min.css">
+    <style>
+        :root {
+            --primary: #2962ff;
+            --secondary: #fbc02d;
+            --success: #26a69a;
+            --danger: #ef5350;
+            --dark: #131722;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-bottom: 3rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid #2a2e39;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            color: #787b86;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            background-color: #1e222d;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #2a2e39;
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #2a2e39;
+        }
+        
+        .card-title h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #d1d4dc;
+        }
+        
+        .card-title .icon {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #d1d4dc;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid #2a2e39;
+            background-color: #131722;
+            color: #e0e0e0;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.3);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio-option input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        .mode-section {
+            padding: 1rem;
+            border-radius: 6px;
+            background-color: #1a1e29;
+            margin-top: 1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--primary), #4d8bff);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #5c6674, #4a515e);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #657080, #555f6c);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-with-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #2a2e39, transparent);
+            margin: 1.5rem 0;
+        }
+        
+        .symbol-input {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .symbol-input input {
+            flex: 1;
+        }
+        
+        .info-box {
+            background-color: #1a1e29;
+            border-left: 3px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 4px 4px 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .info-box.warning {
+            border-left-color: var(--secondary);
+        }
+        
+        .info-box.success {
+            border-left-color: var(--success);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #787b86;
+            font-size: 0.9rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #2a2e39;
+        }
+        
+        @media (max-width: 768px) {
+            .radio-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .card {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OHLC Data Toolkit</h1>
+            <p class="subtitle">Download historical price data and generate professional candlestick charts</p>
+            <div class="radio-group" style="justify-content: center; margin-top: 1rem;">
+                <div class="radio-option">
+                    <input type="radio" id="mode-download" name="app-mode" checked>
+                    <label for="mode-download" style="margin: 0; font-weight: 500; cursor: pointer;">Download CSV</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="mode-visualize" name="app-mode">
+                    <label for="mode-visualize" style="margin: 0; font-weight: 500; cursor: pointer;">Visualize Data</label>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Download CSV Section -->
+        <section id="download-section" class="card">
+            <div class="card-title">
+                <div class="icon">1</div>
+                <h2>Download Historical Data as CSV</h2>
+            </div>
+            
+            <form id="download-form">
+                <div class="form-group">
+                    <label for="asset">Symbol (e.g., EURUSD, BTCUSD, XAUUSD)</label>
+                    <input type="text" id="asset" name="asset" value="EURUSD" placeholder="Enter symbol or multiple symbols separated by space">
+                </div>
+                
+                <div class="form-group">
+                    <label for="tf">Timeframe</label>
+                    <select id="tf" name="tf">
+                        <option value="1">1 Minute</option>
+                        <option value="5">5 Minutes</option>
+                        <option value="15" selected>15 Minutes</option>
+                        <option value="30">30 Minutes</option>
+                        <option value="60">1 Hour</option>
+                        <option value="240">4 Hours</option>
+                        <option value="1440">Daily</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Mode Selection</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="mode-lookback" name="date_mode" value="lookback" checked>
+                            <label for="mode-lookback" style="margin:0; cursor:pointer;">Lookback (Number of Candles)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="mode-daterange" name="date_mode" value="daterange">
+                            <label for="mode-daterange" style="margin:0; cursor:pointer;">Date Range</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="lookback-section">
+                    <div class="form-group">
+                        <label for="output_candles">Number of Candles</label>
+                        <input type="number" id="output_candles" name="output_candles" value="85" min="1" max="10000">
+                        <p class="info-box">The system will fetch the specified number of most recent candles. Maximum 10,000 candles per request.</p>
+                    </div>
+                </div>
+                
+                <div id="daterange-section" class="hidden">
+                    <div class="form-group">
+                        <label for="from_date">From Date</label>
+                        <input type="datetime-local" id="from_date" name="from_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="to_date">To Date (optional)</label>
+                        <input type="datetime-local" id="to_date" name="to_date">
+                        <p class="info-box warning">If not specified, current time will be used as the end date.</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="timezone">Timezone (e.g., utc+3:30, utc-5)</label>
+                    <input type="text" id="timezone" name="timezone" value="utc+3:30" placeholder="utc+3:30">
+                    <p class="info-box">Timezone format: utc[+/-]HH[:MM] (e.g., utc+3:30, utc-5, utc+0)</p>
+                </div>
+                
+                <button type="submit" class="btn btn-block btn-with-icon">
+                    <span>↓</span> Download CSV Data
+                </button>
+            </form>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Visualization Section -->
+        <section id="visualize-section" class="card hidden">
+            <div class="card-title">
+                <div class="icon">2</div>
+                <h2>Visualize Data as PDF Chart</h2>
+            </div>
+            
+            <form id="visualize-form">
+                <div class="form-group">
+                    <label>Data Source</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="source-fetch" name="data_source" value="fetch" checked>
+                            <label for="source-fetch" style="margin:0; cursor:pointer;">Fetch Data Directly</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="source-upload" name="data_source" value="upload">
+                            <label for="source-upload" style="margin:0; cursor:pointer;">Upload CSV File(s)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="fetch-mode-section">
+                    <div class="form-group">
+                        <label for="viz-symbols">Symbols (space separated, e.g., "BTCUSD ETHUSD")</label>
+                        <div class="symbol-input">
+                            <input type="text" id="viz-symbols" name="symbols" value="BTCUSD ETHUSD" placeholder="Enter multiple symbols separated by space">
+                        </div>
+                        <p class="info-box">Multiple symbols will be plotted in separate subplots within the same PDF document.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="viz-tf">Timeframe</label>
+                        <select id="viz-tf" name="tf">
+                            <option value="1">1 Minute</option>
+                            <option value="5">5 Minutes</option>
+                            <option value="15" selected>15 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                            <option value="60">1 Hour</option>
+                            <option value="240">4 Hours</option>
+                            <option value="1440">Daily</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mode Selection</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="viz-mode-lookback" name="viz_date_mode" value="lookback" checked>
+                                <label for="viz-mode-lookback" style="margin:0; cursor:pointer;">Lookback (Number of Candles)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="viz-mode-daterange" name="viz_date_mode" value="daterange">
+                                <label for="viz-mode-daterange" style="margin:0; cursor:pointer;">Date Range</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="viz-lookback-section">
+                        <div class="form-group">
+                            <label for="viz-output_candles">Number of Candles</label>
+                            <input type="number" id="viz-output_candles" name="output_candles" value="85" min="1" max="10000">
+                        </div>
+                    </div>
+                    
+                    <div id="viz-daterange-section" class="hidden">
+                        <div class="form-group">
+                            <label for="viz-from_date">From Date</label>
+                            <input type="datetime-local" id="viz-from_date" name="from_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="viz-to_date">To Date (optional)</label>
+                            <input type="datetime-local" id="viz-to_date" name="to_date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="viz-timezone">Timezone (e.g., utc+3:30, utc-5)</label>
+                        <input type="text" id="viz-timezone" name="timezone" value="utc+3:30" placeholder="utc+3:30">
+                    </div>
+                </div>
+                
+                <div id="upload-mode-section" class="hidden">
+                    <div class="form-group">
+                        <label for="csv-files">Upload CSV File(s)</label>
+                        <input type="file" id="csv-files" name="csv_files" accept=".csv" multiple>
+                        <p class="info-box warning">Upload previously downloaded CSV files. For multiple symbols, select multiple files. Filenames should contain the symbol name.</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Chart Settings</label>
+                    <div class="mode-section">
+                        <div class="form-group">
+                            <label for="chart-width">Chart Width (inches)</label>
+                            <input type="number" id="chart-width" name="chart_width" value="16" min="8" max="300" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label for="chart-height">Chart Height per Symbol (inches)</label>
+                            <input type="number" id="chart-height" name="chart_height" value="6" min="3" max="20" step="0.5">
+                            <p class="info-box">Total PDF height will be (height per symbol × number of symbols)</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="candle-width">Candle Width</label>
+                            <input type="range" id="candle-width" name="candle_width" min="0.2" max="1.0" step="0.1" value="0.6">
+                            <span id="candle-width-value">0.6</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-block btn-with-icon">
+                    <span>📊</span> Generate PDF Chart
+                </button>
+            </form>
+        </section>
+        
+        <footer>
+            <p>OHLC Data Toolkit &copy; 2026 | Built with Python backend and w.css framework</p>
+            <p>Uses LiteFinance API for market data | Supports Forex, Crypto, Commodities, and Indices</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mode switching between Download and Visualize
+            const modeDownloadRadio = document.getElementById('mode-download');
+            const modeVisualizeRadio = document.getElementById('mode-visualize');
+            const downloadSection = document.getElementById('download-section');
+            const visualizeSection = document.getElementById('visualize-section');
+            
+            modeDownloadRadio.addEventListener('change', () => {
+                if (modeDownloadRadio.checked) {
+                    downloadSection.classList.remove('hidden');
+                    visualizeSection.classList.add('hidden');
+                }
+            });
+            
+            modeVisualizeRadio.addEventListener('change', () => {
+                if (modeVisualizeRadio.checked) {
+                    visualizeSection.classList.remove('hidden');
+                    downloadSection.classList.add('hidden');
+                }
+            });
+            
+            // Date mode toggling for Download section
+            const lookbackRadio = document.getElementById('mode-lookback');
+            const daterangeRadio = document.getElementById('mode-daterange');
+            const lookbackSection = document.getElementById('lookback-section');
+            const daterangeSection = document.getElementById('daterange-section');
+            
+            function toggleDateMode() {
+                if (lookbackRadio.checked) {
+                    lookbackSection.classList.remove('hidden');
+                    daterangeSection.classList.add('hidden');
+                } else {
+                    lookbackSection.classList.add('hidden');
+                    daterangeSection.classList.remove('hidden');
+                }
+            }
+            
+            lookbackRadio.addEventListener('change', toggleDateMode);
+            daterangeRadio.addEventListener('change', toggleDateMode);
+            toggleDateMode(); // Initialize
+            
+            // Data source toggling for Visualization section
+            const sourceFetchRadio = document.getElementById('source-fetch');
+            const sourceUploadRadio = document.getElementById('source-upload');
+            const fetchModeSection = document.getElementById('fetch-mode-section');
+            const uploadModeSection = document.getElementById('upload-mode-section');
+            
+            function toggleDataSource() {
+                if (sourceFetchRadio.checked) {
+                    fetchModeSection.classList.remove('hidden');
+                    uploadModeSection.classList.add('hidden');
+                } else {
+                    fetchModeSection.classList.add('hidden');
+                    uploadModeSection.classList.remove('hidden');
+                }
+            }
+            
+            sourceFetchRadio.addEventListener('change', toggleDataSource);
+            sourceUploadRadio.addEventListener('change', toggleDataSource);
+            toggleDataSource(); // Initialize
+            
+            // Date mode toggling for Visualization section
+            const vizLookbackRadio = document.getElementById('viz-mode-lookback');
+            const vizDaterangeRadio = document.getElementById('viz-mode-daterange');
+            const vizLookbackSection = document.getElementById('viz-lookback-section');
+            const vizDaterangeSection = document.getElementById('viz-daterange-section');
+            
+            function toggleVizDateMode() {
+                if (vizLookbackRadio.checked) {
+                    vizLookbackSection.classList.remove('hidden');
+                    vizDaterangeSection.classList.add('hidden');
+                } else {
+                    vizLookbackSection.classList.add('hidden');
+                    vizDaterangeSection.classList.remove('hidden');
+                }
+            }
+            
+            vizLookbackRadio.addEventListener('change', toggleVizDateMode);
+            vizDaterangeRadio.addEventListener('change', toggleVizDateMode);
+            toggleVizDateMode(); // Initialize
+            
+            // Candle width slider
+            const candleWidthSlider = document.getElementById('candle-width');
+            const candleWidthValue = document.getElementById('candle-width-value');
+            
+            candleWidthSlider.addEventListener('input', () => {
+                candleWidthValue.textContent = candleWidthSlider.value;
+            });
+            
+            // Form submissions
+            document.getElementById('download-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real implementation, this would send data to backend
+                // For demo purposes, we'll show an alert
+                const asset = document.getElementById('asset').value;
+                const tf = document.getElementById('tf').value;
+                const dateMode = document.querySelector('input[name="date_mode"]:checked').value;
+                let params = `Symbol: ${asset}, Timeframe: ${tf}m, Mode: ${dateMode === 'lookback' ? 'Last ' + document.getElementById('output_candles').value + ' candles' : 'Date Range'}`;
+                
+                alert(`CSV Download Requested\n\n${params}\n\nIn a real implementation, this would trigger a backend API call to fetch data using your Python functions and return a CSV file for download.`);
+            });
+            
+            document.getElementById('visualize-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real implementation, this would send data to backend
+                const dataSource = document.querySelector('input[name="data_source"]:checked').value;
+                let params = `Data Source: ${dataSource === 'fetch' ? 'Fetch Directly' : 'Upload CSV Files'}`;
+                
+                if (dataSource === 'fetch') {
+                    const symbols = document.getElementById('viz-symbols').value;
+                    const tf = document.getElementById('viz-tf').value;
+                    const dateMode = document.querySelector('input[name="viz_date_mode"]:checked').value;
+                    params += `\nSymbols: ${symbols}\nTimeframe: ${tf}m\nMode: ${dateMode === 'lookback' ? 'Last ' + document.getElementById('viz-output_candles').value + ' candles' : 'Date Range'}`;
+                } else {
+                    const files = document.getElementById('csv-files').files;
+                    params += `\nFiles selected: ${files.length}`;
+                }
+                
+                const width = document.getElementById('chart-width').value;
+                const height = document.getElementById('chart-height').value;
+                const candleWidth = document.getElementById('candle-width').value;
+                params += `\n\nChart Settings:\nWidth: ${width} inches\nHeight per symbol: ${height} inches\nCandle width: ${candleWidth}`;
+                
+                alert(`PDF Chart Generation Requested\n\n${params}\n\nIn a real implementation, this would trigger your Python backend to:\n1. Fetch data for all symbols (or process uploaded CSVs)\n2. Generate candlestick charts using plot_candlestick.py\n3. Combine all charts into a single PDF\n4. Return the PDF for download`);
+            });
+            
+            // Set default dates to recent times
+            const now = new Date();
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            // Format dates for datetime-local inputs
+            function formatDateTimeLocal(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+            
+            document.getElementById('from_date').value = formatDateTimeLocal(yesterday);
+            document.getElementById('to_date').value = formatDateTimeLocal(now);
+            document.getElementById('viz-from_date').value = formatDateTimeLocal(yesterday);
+            document.getElementById('viz-to_date').value = formatDateTimeLocal(now);
+        });
+    </script>
+</body>
+</html>
